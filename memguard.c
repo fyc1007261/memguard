@@ -1147,8 +1147,17 @@ static int throttle_thread(void *arg)
 	struct core_info *cinfo = per_cpu_ptr(core_info, cpunr);
 
 #if LINUX_VERSION_CODE > KERNEL_VERSION(5, 9, 0)
-	sched_set_fifo(current);
+	// sched_set_fifo(current);
+	struct sched_attr attr = {
+		.sched_policy = SCHED_DEADLINE,
+		.sched_priority = 0,
+		.sched_runtime = 1000000,
+		.sched_deadline = 1000000,
+		.sched_period = 1000000,
+	};
+	sched_set_attr(current, &attr, 0);
 #else
+	assert(0);
 	static const struct sched_param param = {
 		.sched_priority = MAX_USER_RT_PRIO/2,
 	};
